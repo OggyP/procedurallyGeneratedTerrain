@@ -99,7 +99,7 @@ int main()
 #if defined(_DEBUG)
 	std::cout << "Hello World!" << std::endl;
 #endif
-	int screenSize[2] = { 100, 100 };
+	int screenSize[2] = { 1000, 1000 };
 
 	// Initialize stuff
 	/* initialize random seed: */
