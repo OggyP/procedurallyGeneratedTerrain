@@ -1,7 +1,7 @@
 #include "Platform/Platform.hpp"
 #include <math.h>
 // noise.hpp is included in terrain.hpp
-int boxSize = 10;
+int boxSize = 5;
 const int chunkSize = 6;
 #include "terrain.hpp"
 #include <time.h>
@@ -117,7 +117,7 @@ int main()
 	platform.setIcon(window.getSystemHandle());
 
 	// Limit the framerate to 60 frames per second (this step is optional)
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(120);
 
 	sf::Event event;
 
@@ -239,7 +239,17 @@ int main()
 
 		totalFrames++;
 		double seconds_since_start = difftime(time(0), start);
-		cout << "Framerate: " << totalFrames / seconds_since_start << "\n";
+		double FrameRate = totalFrames / seconds_since_start;
+		if (FrameRate < 45)
+		{
+			boxSize++;
+			rect.setSize(sf::Vector2f(boxSize, boxSize));
+		}
+		else if (FrameRate > 75) {
+			boxSize--;
+			rect.setSize(sf::Vector2f(boxSize, boxSize));
+		}
+		cout << "Framerate: " << FrameRate << "\n";
 		window.display();
 	}
 	return 0;
