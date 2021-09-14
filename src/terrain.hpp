@@ -1,5 +1,4 @@
 #include <noise.hpp>
-const float zoomScale = 10;
 
 class GameTile
 {
@@ -32,7 +31,7 @@ public:
 		{
 			for (int xToCalc = 0; xToCalc < chunkSize; xToCalc++)
 			{
-				double noiseVal = ValueNoise_2D(((double)tileStartCoord[0] + (double)xToCalc * (double)boxSize + (double)seed[0]) / (double)zoomScale, ((double)tileStartCoord[1] + (double)yToCalc * (double)boxSize + (double)seed[1]) / (double)zoomScale);
+				double noiseVal = ValueNoise_2D(((double)tileStartCoord[0] + (double)xToCalc * (double)boxSize + (double)seed[0]) / (double)zoomScale / (double)boxSize, ((double)tileStartCoord[1] + (double)yToCalc * (double)boxSize + (double)seed[1]) / (double)zoomScale / (double)boxSize);
 				// tiles[yToCalc][xToCalc]
 				// cout << noiseVal << "\n";
 
