@@ -128,9 +128,13 @@ int main()
 	rect.setFillColor(sf::Color::White);
 	platform.setIcon(window.getSystemHandle());
 	sf::Font font;
-	if (!font.loadFromFile("./src/BAHNSCHRIFT.ttf"))
+	if (!font.loadFromFile("./BAHNSCHRIFT.ttf"))
 	{
 		cout << "Error loading font";
+		if (!font.loadFromFile("./src/BAHNSCHRIFT.ttf"))
+		{
+			cout << "Error loading font";
+		}
 	}
 	sf::Text text;
 	text.setFillColor(sf::Color::White);
