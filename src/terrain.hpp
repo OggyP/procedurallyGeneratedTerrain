@@ -26,12 +26,12 @@ public:
 	{}
 	GameChunk(int chunkX, int chunkY, int seed[2])
 	{
-		const int tileStartCoord[2] = { chunkX * chunkSize * boxSize, chunkY * chunkSize * boxSize };
+		const int tileStartCoord[2] = { chunkX * chunkSize, chunkY * chunkSize };
 		for (int yToCalc = 0; yToCalc < chunkSize; yToCalc++)
 		{
 			for (int xToCalc = 0; xToCalc < chunkSize; xToCalc++)
 			{
-				double noiseVal = ValueNoise_2D(((double)tileStartCoord[0] + (double)xToCalc * (double)boxSize + (double)seed[0]) / (double)zoomScale / (double)boxSize, ((double)tileStartCoord[1] + (double)yToCalc * (double)boxSize + (double)seed[1]) / (double)zoomScale / (double)boxSize);
+				double noiseVal = ValueNoise_2D(((double)tileStartCoord[0] + (double)xToCalc) * zoomScale * boxSize + (double)seed[0], ((double)tileStartCoord[1] + (double)yToCalc) * zoomScale * boxSize + (double)seed[1]);
 				// tiles[yToCalc][xToCalc]
 				// cout << noiseVal << "\n";
 

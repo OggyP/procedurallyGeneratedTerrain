@@ -2,7 +2,7 @@
 #include <math.h>
 // noise.hpp is included in terrain.hpp
 int boxSize = 10;
-float zoomScale = 1;
+float zoomScale = 0.1;
 const int chunkSize = 8;
 #include "terrain.hpp"
 #include <time.h>
@@ -99,7 +99,7 @@ int main()
 #if defined(_DEBUG)
 	std::cout << "Hello World!" << std::endl;
 #endif
-	int screenSize[2] = { 100, 100 };
+	int screenSize[2] = { 1000, 1000 };
 
 	// Initialize stuff
 	/* initialize random seed: */
@@ -128,9 +128,13 @@ int main()
 	rect.setFillColor(sf::Color::White);
 	platform.setIcon(window.getSystemHandle());
 	sf::Font font;
-	if (!font.loadFromFile("./src/BAHNSCHRIFT.ttf"))
+	if (!font.loadFromFile("./content/BAHNSCHRIFT.ttf"))
 	{
 		cout << "Error loading font";
+		if (!font.loadFromFile("./src/BAHNSCHRIFT.ttf"))
+		{
+			cout << "Error loading font";
+		}
 	}
 	sf::Text text;
 	text.setFillColor(sf::Color::White);
@@ -249,28 +253,28 @@ int main()
 
 			if (Keyboard::isKeyPressed(Keyboard::Left))
 			{
-				offset[0] -= boxSize;
+				offset[0] -= 20;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Down))
 			{
-				offset[1] += boxSize;
+				offset[1] += 20;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Right))
 			{
-				offset[0] += boxSize;
+				offset[0] += 20;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Up))
 			{
-				offset[1] -= boxSize;
+				offset[1] -= 20;
 			}
 
 			window.clear();
 
 			int chunksOnScreen[2][2] = {
-				{ (int)floor(offset[0] / boxSize / chunkSize) - 1, (int)floor(offset[1] / boxSize / chunkSize) - 1 },									 //start pos
+				{ (int)floor(offset[0] / boxSize / chunkSize), (int)floor(offset[1] / boxSize / chunkSize) },											 //start pos
 				{ (int)floor((offset[0] + screenSize[0]) / boxSize / chunkSize) + 1, (int)floor((offset[1] + screenSize[1]) / boxSize / chunkSize) + 1 } //end pos
 			};
 
