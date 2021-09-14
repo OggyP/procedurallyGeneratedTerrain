@@ -25,8 +25,8 @@ bool changeBoxSizeSlider = false;
 // map of chunks
 std::map<std::string, GameChunk> worldMap;
 
-void genNewChunk(string chunkKey, int chunkX, int chunkY, int seed[2]);
-void genNewChunk(string chunkKey, int chunkX, int chunkY, int seed[2])
+void genNewChunk(string& chunkKey, int& chunkX, int& chunkY, int seed[2]);
+void genNewChunk(string& chunkKey, int& chunkX, int& chunkY, int seed[2])
 {
 	// Key is not present
 	GameChunk newChunk = GameChunk(chunkX, chunkY, seed);
