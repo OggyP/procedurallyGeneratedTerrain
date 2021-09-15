@@ -101,7 +101,7 @@ int main()
 	std::cout << "Hello World!" << std::endl;
 #endif
 	// CONST
-	const float movementSpeed = 600;
+	const float movementSpeed = 400;
 
 	int screenSize[2] = { 1000, 1000 };
 
