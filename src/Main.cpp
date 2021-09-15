@@ -1,5 +1,6 @@
 #include "Platform/Platform.hpp"
 #include <math.h>
+#include <movementVector.hpp>
 // noise.hpp is included in terrain.hpp
 int boxSize = 10;
 float zoomScale = 0.1;
@@ -99,6 +100,9 @@ int main()
 #if defined(_DEBUG)
 	std::cout << "Hello World!" << std::endl;
 #endif
+	// CONST
+	const float movementSpeed = 600;
+
 	int screenSize[2] = { 1000, 1000 };
 
 	// Initialize stuff
@@ -148,13 +152,17 @@ int main()
 	playButton.setFillColor(sf::Color(219, 33, 8));
 	playButton.setOrigin(sf::Vector2f(150, 50));
 
+	sf::Clock deltaClock;
+
 	// Limit the framerate to 60 frames per second (this step is optional)
-	window.setFramerateLimit(120);
+	window.setFramerateLimit(30);
 
 	sf::Event event;
 
 	while (window.isOpen())
 	{
+		// reset deltaTime
+		sf::Time dt = deltaClock.restart();
 		int boxesDrawn = 0;
 		while (window.pollEvent(event))
 		{
@@ -211,6 +219,7 @@ int main()
 				if (mouseCord[0] >= screenSize[0] / 2 - 150 && mouseCord[0] <= screenSize[0] / 2 + 150 && mouseCord[1] >= screenSize[1] / 1.75 - 50 && mouseCord[1] <= screenSize[1] / 1.75 + 50)
 				{
 					titleScreen = false;
+					window.setFramerateLimit(120);
 					// Reset FPS
 					start = time(0);
 				}
@@ -253,26 +262,38 @@ int main()
 		}
 		else
 		{
-
+			movementVector movement;
+			int keysPressed = 0;
 			if (Keyboard::isKeyPressed(Keyboard::Left))
 			{
-				offset[0] -= 20;
+				movement.x -= movementSpeed * dt.asSeconds();
+				keysPressed++;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Down))
 			{
-				offset[1] += 20;
+				movement.y += movementSpeed * dt.asSeconds();
+				keysPressed++;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Right))
 			{
-				offset[0] += 20;
+				movement.x += movementSpeed * dt.asSeconds();
+				keysPressed++;
 			}
 
 			if (Keyboard::isKeyPressed(Keyboard::Up))
 			{
-				offset[1] -= 20;
+				movement.y -= movementSpeed * dt.asSeconds();
+				keysPressed++;
 			}
+			if (keysPressed > 1)
+			{
+				movement.setVector(movement.getDirection(), movementSpeed * dt.asSeconds());
+			}
+
+			offset[0] += movement.x;
+			offset[1] += movement.y;
 
 			window.clear();
 
