@@ -1,3 +1,4 @@
+#define UNUSED(x) (void)(x)
 #include "Platform/Platform.hpp"
 #include <math.h>
 #include <movementVector.hpp>
@@ -151,6 +152,12 @@ int main()
 	sf::RectangleShape playButton(sf::Vector2f(300, 100));
 	playButton.setFillColor(sf::Color(219, 33, 8));
 	playButton.setOrigin(sf::Vector2f(150, 50));
+	sf::CircleShape playerShape(20.f);
+	playerShape.setFillColor(sf::Color(219, 33, 8));
+	playerShape.setPosition(screenSize[0] / 2, screenSize[1] / 2);
+	playerShape.setOrigin(sf::Vector2f(20, 20));
+	sf::CircleShape dot(6.f);
+	dot.setFillColor(sf::Color::Black);
 
 	sf::Clock deltaClock;
 
@@ -186,9 +193,13 @@ int main()
 			{
 				// update the view to the new size of the window
 				sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-				screenSize[0] = event.size.width;
-				screenSize[1] = event.size.height;
+				cout << (screenSize[0] - event.size.width) / 2;
+				offset[0] += (int)((int)screenSize[0] - (int)event.size.width) / 2;
+				offset[1] += (int)((int)screenSize[1] - (int)event.size.height) / 2;
+				screenSize[0] = (int)event.size.width;
+				screenSize[1] = (int)event.size.height;
 				window.setView(sf::View(visibleArea));
+				playerShape.setPosition(screenSize[0] / 2, screenSize[1] / 2);
 			}
 		}
 
@@ -262,6 +273,9 @@ int main()
 		}
 		else
 		{
+			// ====================================
+			// ACTUAL GAMESTAT
+			// ====================================
 			movementVector movement;
 			int keysPressed = 0;
 			if (Keyboard::isKeyPressed(Keyboard::Left))
@@ -287,13 +301,70 @@ int main()
 				movement.y -= movementSpeed * dt.asSeconds();
 				keysPressed++;
 			}
-			if (keysPressed > 1)
+			if (keysPressed > 0)
 			{
-				movement.setVector(movement.getDirection(), movementSpeed * dt.asSeconds());
-			}
+				bool invalidLocation = true;
+				int passNum = 0;
+				double xVal = movement.x;
+				while (invalidLocation)
+				{
+					if (movement.x != 0 || movement.y != 0)
+					{
+						movement.setVector(movement.getDirection(), movementSpeed * dt.asSeconds());
+					}
+					else if (passNum == 1)
+					{
+						movement.y = 0;
+						movement.x = xVal;
+					}
+					string currentChunkKey = to_string((int)floor((offset[0] + movement.x + screenSize[0] / 2) / (chunkSize * boxSize)));
+					currentChunkKey.push_back('|');
+					currentChunkKey.append(to_string((int)floor((offset[1] + movement.y + screenSize[1] / 2) / (chunkSize * boxSize))));
+					cout << currentChunkKey << " : key\n";
+					std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
+					if (it == worldMap.end())
+					{}
+					else
+					{
+						GameChunk& currentChunk = it->second;
+						int boxX = (int)floor(((int)abs(offset[0] + movement.x + screenSize[0] / 2) % (chunkSize * boxSize)) / boxSize);
+						int boxY = (int)floor(((int)abs(offset[1] + movement.y + screenSize[1] / 2) % (chunkSize * boxSize)) / boxSize);
+						if (currentChunk.x < 0)
+						{
+							boxX = 7 - boxX;
+						}
+						if (currentChunk.y < 0)
+						{
+							boxY = 7 - boxY;
+						}
 
-			offset[0] += movement.x;
-			offset[1] += movement.y;
+						cout << boxX << "|" << boxY << " : box\n";
+						float xPos = (currentChunk.x * chunkSize * boxSize + boxX * boxSize) - offset[0];
+						float yPos = (currentChunk.y * chunkSize * boxSize + boxY * boxSize) - offset[1];
+						dot.setPosition(sf::Vector2f(xPos, yPos));
+						if (currentChunk.tiles[boxY][boxX].type != 2)
+						{
+							offset[0] += movement.x;
+							offset[1] += movement.y;
+							invalidLocation = false;
+						}
+						else if (passNum == 0)
+						{
+							movement.x = 0;
+						}
+						else if (passNum == 1)
+						{
+							movement.y = 0;
+							movement.x = xVal;
+						}
+						else
+						{
+							invalidLocation = false;
+						}
+						passNum++;
+					}
+				}
+			}
 
 			window.clear();
 
@@ -370,6 +441,10 @@ int main()
 				}
 			}
 
+			// Draw player
+			window.draw(playerShape);
+			window.draw(dot);
+
 			// offScreenThreadList.clear();
 			// If thread Object is Joinable then Join that thread.
 			if (genNewOffscreenThread.joinable())
@@ -380,8 +455,9 @@ int main()
 			genNewOffscreenThread = std::move(offscreenThread);
 
 			totalFrames++;
-			double seconds_since_start = difftime(time(0), start);
-			cout << "Framerate: " << totalFrames / seconds_since_start << "\nBoxes Drawn: " << boxesDrawn << "\n";
+			double secondsSinceStart = difftime(time(0), start);
+			UNUSED(secondsSinceStart);
+			// cout << "Framerate: " << totalFrames / secondsSinceStart << "\nBoxes Drawn: " << boxesDrawn << "\n";
 			window.display();
 		}
 	}

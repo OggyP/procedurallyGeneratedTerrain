@@ -26,6 +26,8 @@ public:
 	{}
 	GameChunk(int chunkX, int chunkY, int seed[2])
 	{
+		x = chunkX;
+		y = chunkY;
 		const int tileStartCoord[2] = { chunkX * chunkSize, chunkY * chunkSize };
 		for (int yToCalc = 0; yToCalc < chunkSize; yToCalc++)
 		{
