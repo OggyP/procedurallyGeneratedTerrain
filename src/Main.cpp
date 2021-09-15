@@ -155,6 +155,7 @@ int main()
 
 	while (window.isOpen())
 	{
+		int boxesDrawn = 0;
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
@@ -274,8 +275,8 @@ int main()
 			window.clear();
 
 			int chunksOnScreen[2][2] = {
-				{ (int)floor(offset[0] / boxSize / chunkSize), (int)floor(offset[1] / boxSize / chunkSize) },											 //start pos
-				{ (int)floor((offset[0] + screenSize[0]) / boxSize / chunkSize) + 1, (int)floor((offset[1] + screenSize[1]) / boxSize / chunkSize) + 1 } //end pos
+				{ (int)floor(offset[0] / (chunkSize * boxSize)), (int)floor(offset[1] / (chunkSize * boxSize)) },											 //start pos
+				{ (int)floor((offset[0] + screenSize[0]) / (chunkSize * boxSize)) + 1, (int)floor((offset[1] + screenSize[1]) / (chunkSize * boxSize)) + 1 } //end pos
 			};
 
 			for (int chunkX = chunksOnScreen[0][0]; chunkX < chunksOnScreen[1][0]; chunkX++)
@@ -303,10 +304,19 @@ int main()
 							{
 								for (int yInChunk = 0; yInChunk < chunkSize; yInChunk++)
 								{
-									GameTile currentTile = currentChunk.tiles[yInChunk][xInChunk];
-									rect.setPosition((chunkX * chunkSize * boxSize + xInChunk * boxSize) - offset[0], (chunkY * chunkSize * boxSize + yInChunk * boxSize) - offset[1]);
-									rect.setFillColor(currentTile.colour);
-									window.draw(rect);
+									float xPos = (chunkX * chunkSize * boxSize + xInChunk * boxSize) - offset[0];
+									if (xPos < screenSize[0])
+									{
+										float yPos = (chunkY * chunkSize * boxSize + yInChunk * boxSize) - offset[1];
+										if (yPos + boxSize > 0)
+										{
+											GameTile currentTile = currentChunk.tiles[yInChunk][xInChunk];
+											rect.setPosition(xPos, yPos);
+											rect.setFillColor(currentTile.colour);
+											window.draw(rect);
+											boxesDrawn++;
+										}
+									}
 								}
 							}
 						}
@@ -318,10 +328,19 @@ int main()
 						{
 							for (int yInChunk = 0; yInChunk < chunkSize; yInChunk++)
 							{
-								GameTile currentTile = currentChunk.tiles[yInChunk][xInChunk];
-								rect.setPosition((chunkX * chunkSize * boxSize + xInChunk * boxSize) - offset[0], (chunkY * chunkSize * boxSize + yInChunk * boxSize) - offset[1]);
-								rect.setFillColor(currentTile.colour);
-								window.draw(rect);
+								float xPos = (chunkX * chunkSize * boxSize + xInChunk * boxSize) - offset[0];
+								if (xPos < screenSize[0])
+								{
+									float yPos = (chunkY * chunkSize * boxSize + yInChunk * boxSize) - offset[1];
+									if (yPos + boxSize > 0)
+									{
+										GameTile currentTile = currentChunk.tiles[yInChunk][xInChunk];
+										rect.setPosition(xPos, yPos);
+										rect.setFillColor(currentTile.colour);
+										window.draw(rect);
+										boxesDrawn++;
+									}
+								}
 							}
 						}
 					}
@@ -339,7 +358,7 @@ int main()
 
 			totalFrames++;
 			double seconds_since_start = difftime(time(0), start);
-			cout << "Framerate: " << totalFrames / seconds_since_start << "\n";
+			cout << "Framerate: " << totalFrames / seconds_since_start << "\nBoxes Drawn: " << boxesDrawn << "\n";
 			window.display();
 		}
 	}
