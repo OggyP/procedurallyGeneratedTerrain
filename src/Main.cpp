@@ -58,7 +58,6 @@ void checkForMissingOffscreenChunks(int chunksOnScreen[2][2], int seed[2])
 			std::map<std::string, GameChunk>::iterator it = worldMap.find(chunkKey);
 			if (it == worldMap.end())
 			{
-				// std::cout << " New Chunk - Premptive - " << chunkKey << "\n";
 				// void genNewChunk(string& chunkKey, int& chunkX, int& chunkY, int seed[2], sf::RenderWindow& window, sf::RectangleShape& rect)
 				genNewChunk(chunkKey, chunkX, chunkY, seed);
 			}
@@ -78,7 +77,6 @@ void checkForMissingOffscreenChunks(int chunksOnScreen[2][2], int seed[2])
 			std::map<std::string, GameChunk>::iterator it = worldMap.find(chunkKey);
 			if (it == worldMap.end())
 			{
-				// std::cout << " New Chunk - Premptive - " << chunkKey << "\n";
 				// void genNewChunk(string& chunkKey, int& chunkX, int& chunkY, int seed[2], sf::RenderWindow& window, sf::RectangleShape& rect)
 				genNewChunk(chunkKey, chunkX, chunkY, seed);
 			}
@@ -137,7 +135,6 @@ int main()
 	sf::Font font;
 	if (!font.loadFromFile("./content/BAHNSCHRIFT.ttf"))
 	{
-		cout << "Error loading font";
 		if (!font.loadFromFile("./src/BAHNSCHRIFT.ttf"))
 		{
 			cout << "Error loading font";
@@ -206,7 +203,6 @@ int main()
 			{
 				// update the view to the new size of the window
 				sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-				cout << (screenSize[0] - event.size.width) / 2;
 				offset[0] += (int)((int)screenSize[0] - (int)event.size.width) / 2;
 				offset[1] += (int)((int)screenSize[1] - (int)event.size.height) / 2;
 				screenSize[0] = (int)event.size.width;
@@ -335,7 +331,6 @@ int main()
 						string currentChunkKey = to_string((int)floor((offset[0] + movement.x + screenSize[0] / 2) / (chunkSize * boxSize)));
 						currentChunkKey.push_back('|');
 						currentChunkKey.append(to_string((int)floor((offset[1] + movement.y + screenSize[1] / 2) / (chunkSize * boxSize))));
-						cout << currentChunkKey << " : key\n";
 						std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
 						if (it == worldMap.end())
 						{}
@@ -352,8 +347,6 @@ int main()
 							{
 								boxY = 7 - boxY;
 							}
-
-							cout << boxX << "|" << boxY << " : box\n";
 							if (currentChunk.tiles[boxY][boxX].type != 2)
 							{
 								offset[0] += movement.x;
@@ -388,7 +381,6 @@ int main()
 					string currentChunkKey = to_string((int)floor((offset[0] + mouseCord[0]) / (chunkSize * boxSize)));
 					currentChunkKey.push_back('|');
 					currentChunkKey.append(to_string((int)floor((offset[1] + mouseCord[1]) / (chunkSize * boxSize))));
-					cout << currentChunkKey << " : key\n";
 					std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
 					if (it == worldMap.end())
 					{}
@@ -429,7 +421,6 @@ int main()
 					std::map<std::string, GameChunk>::iterator it = worldMap.find(chunkKey);
 					if (it == worldMap.end())
 					{
-						// std::cout << " New Chunk - On Screen";
 						// void genNewChunk(string& chunkKey, int& chunkX, int& chunkY, int seed[2], sf::RenderWindow& window, sf::RectangleShape& rect)
 						genNewChunk(chunkKey, chunkX, chunkY, seed);
 						std::map<std::string, GameChunk>::iterator it = worldMap.find(chunkKey);
