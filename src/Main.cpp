@@ -152,10 +152,19 @@ int main()
 	sf::RectangleShape playButton(sf::Vector2f(300, 100));
 	playButton.setFillColor(sf::Color(219, 33, 8));
 	playButton.setOrigin(sf::Vector2f(150, 50));
-	sf::CircleShape playerShape(20.f);
-	playerShape.setFillColor(sf::Color(219, 33, 8));
-	playerShape.setPosition(screenSize[0] / 2, screenSize[1] / 2);
-	playerShape.setOrigin(sf::Vector2f(20, 20));
+	sf::Texture playerTexture;
+	if (!playerTexture.loadFromFile("/content/1:1.png"))
+	{
+		if (!playerTexture.loadFromFile("./src/1:1.png"))
+		{
+			return -1;
+		}
+	}
+	sf::Sprite playerSprite;
+	playerSprite.setScale(2, 2);
+	playerSprite.setTexture(playerTexture);
+	playerSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
+	playerSprite.setOrigin(sf::Vector2f(7, 25));
 
 	sf::Clock deltaClock;
 
@@ -197,7 +206,7 @@ int main()
 				screenSize[0] = (int)event.size.width;
 				screenSize[1] = (int)event.size.height;
 				window.setView(sf::View(visibleArea));
-				playerShape.setPosition(screenSize[0] / 2, screenSize[1] / 2);
+				playerSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
 			}
 		}
 
@@ -468,7 +477,7 @@ int main()
 			}
 
 			// Draw player
-			window.draw(playerShape);
+			window.draw(playerSprite);
 
 			// offScreenThreadList.clear();
 			// If thread Object is Joinable then Join that thread.
