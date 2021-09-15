@@ -4,7 +4,7 @@
 #include <movementVector.hpp>
 // noise.hpp is included in terrain.hpp
 int boxSize = 10;
-float zoomScale = 0.1;
+float zoomScale = 0.06;
 const int chunkSize = 8;
 #include "terrain.hpp"
 #include <time.h>
@@ -156,8 +156,6 @@ int main()
 	playerShape.setFillColor(sf::Color(219, 33, 8));
 	playerShape.setPosition(screenSize[0] / 2, screenSize[1] / 2);
 	playerShape.setOrigin(sf::Vector2f(20, 20));
-	sf::CircleShape dot(6.f);
-	dot.setFillColor(sf::Color::Black);
 
 	sf::Clock deltaClock;
 
@@ -339,9 +337,6 @@ int main()
 						}
 
 						cout << boxX << "|" << boxY << " : box\n";
-						float xPos = (currentChunk.x * chunkSize * boxSize + boxX * boxSize) - offset[0];
-						float yPos = (currentChunk.y * chunkSize * boxSize + boxY * boxSize) - offset[1];
-						dot.setPosition(sf::Vector2f(xPos, yPos));
 						if (currentChunk.tiles[boxY][boxX].type != 2)
 						{
 							offset[0] += movement.x;
@@ -363,6 +358,37 @@ int main()
 						}
 						passNum++;
 					}
+				}
+			}
+
+			mouseBtn[0] = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+			mouseBtn[1] = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+			mouseCord[0] = sf::Mouse::getPosition(window).x;
+			mouseCord[1] = sf::Mouse::getPosition(window).y;
+
+			if (mouseBtn[0])
+			{
+				string currentChunkKey = to_string((int)floor((offset[0] + mouseCord[0]) / (chunkSize * boxSize)));
+				currentChunkKey.push_back('|');
+				currentChunkKey.append(to_string((int)floor((offset[1] + mouseCord[1]) / (chunkSize * boxSize))));
+				cout << currentChunkKey << " : key\n";
+				std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
+				if (it == worldMap.end())
+				{}
+				else
+				{
+					GameChunk& currentChunk = it->second;
+					int boxX = (int)floor(((int)abs(offset[0] + mouseCord[0]) % (chunkSize * boxSize)) / boxSize);
+					int boxY = (int)floor(((int)abs(offset[1] + mouseCord[1]) % (chunkSize * boxSize)) / boxSize);
+					if (currentChunk.x < 0)
+					{
+						boxX = 7 - boxX;
+					}
+					if (currentChunk.y < 0)
+					{
+						boxY = 7 - boxY;
+					}
+					currentChunk.tiles[boxY][boxX] = GameTile(6, sf::Color(102, 56, 8));
 				}
 			}
 
@@ -443,7 +469,6 @@ int main()
 
 			// Draw player
 			window.draw(playerShape);
-			window.draw(dot);
 
 			// offScreenThreadList.clear();
 			// If thread Object is Joinable then Join that thread.
