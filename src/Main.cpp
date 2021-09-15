@@ -121,6 +121,8 @@ int main()
 	int mouseCord[2];
 	bool mouseBtn[2] = { 0, 0 };
 
+	bool inFocus = true;
+
 	// SFML Window
 	sf::RenderWindow window;
 	// in Windows at least, this must be called before creating the window
@@ -194,6 +196,10 @@ int main()
 					genNewOffscreenThread.join();
 				return 0;
 			}
+			else if (event.type == sf::Event::GainedFocus)
+				inFocus = true;
+			else if (event.type == sf::Event::LostFocus)
+				inFocus = false;
 
 			// catch the resize events
 			if (event.type == sf::Event::Resized)
@@ -283,50 +289,105 @@ int main()
 			// ====================================
 			// ACTUAL GAMESTAT
 			// ====================================
-			movementVector movement;
-			int keysPressed = 0;
-			if (Keyboard::isKeyPressed(Keyboard::Left))
+			if (inFocus)
 			{
-				movement.x -= movementSpeed * dt.asSeconds();
-				keysPressed++;
-			}
-
-			if (Keyboard::isKeyPressed(Keyboard::Down))
-			{
-				movement.y += movementSpeed * dt.asSeconds();
-				keysPressed++;
-			}
-
-			if (Keyboard::isKeyPressed(Keyboard::Right))
-			{
-				movement.x += movementSpeed * dt.asSeconds();
-				keysPressed++;
-			}
-
-			if (Keyboard::isKeyPressed(Keyboard::Up))
-			{
-				movement.y -= movementSpeed * dt.asSeconds();
-				keysPressed++;
-			}
-			if (keysPressed > 0)
-			{
-				bool invalidLocation = true;
-				int passNum = 0;
-				double xVal = movement.x;
-				while (invalidLocation)
+				movementVector movement;
+				int keysPressed = 0;
+				if (Keyboard::isKeyPressed(Keyboard::Left))
 				{
-					if (movement.x != 0 || movement.y != 0)
+					movement.x -= movementSpeed * dt.asSeconds();
+					keysPressed++;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Down))
+				{
+					movement.y += movementSpeed * dt.asSeconds();
+					keysPressed++;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Right))
+				{
+					movement.x += movementSpeed * dt.asSeconds();
+					keysPressed++;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Up))
+				{
+					movement.y -= movementSpeed * dt.asSeconds();
+					keysPressed++;
+				}
+				if (keysPressed > 0)
+				{
+					bool invalidLocation = true;
+					int passNum = 0;
+					double xVal = movement.x;
+					while (invalidLocation)
 					{
-						movement.setVector(movement.getDirection(), movementSpeed * dt.asSeconds());
+						if (movement.x != 0 || movement.y != 0)
+						{
+							movement.setVector(movement.getDirection(), movementSpeed * dt.asSeconds());
+						}
+						else if (passNum == 1)
+						{
+							movement.y = 0;
+							movement.x = xVal;
+						}
+						string currentChunkKey = to_string((int)floor((offset[0] + movement.x + screenSize[0] / 2) / (chunkSize * boxSize)));
+						currentChunkKey.push_back('|');
+						currentChunkKey.append(to_string((int)floor((offset[1] + movement.y + screenSize[1] / 2) / (chunkSize * boxSize))));
+						cout << currentChunkKey << " : key\n";
+						std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
+						if (it == worldMap.end())
+						{}
+						else
+						{
+							GameChunk& currentChunk = it->second;
+							int boxX = (int)floor(((int)abs(offset[0] + movement.x + screenSize[0] / 2) % (chunkSize * boxSize)) / boxSize);
+							int boxY = (int)floor(((int)abs(offset[1] + movement.y + screenSize[1] / 2) % (chunkSize * boxSize)) / boxSize);
+							if (currentChunk.x < 0)
+							{
+								boxX = 7 - boxX;
+							}
+							if (currentChunk.y < 0)
+							{
+								boxY = 7 - boxY;
+							}
+
+							cout << boxX << "|" << boxY << " : box\n";
+							if (currentChunk.tiles[boxY][boxX].type != 2)
+							{
+								offset[0] += movement.x;
+								offset[1] += movement.y;
+								invalidLocation = false;
+							}
+							else if (passNum == 0)
+							{
+								movement.x = 0;
+							}
+							else if (passNum == 1)
+							{
+								movement.y = 0;
+								movement.x = xVal;
+							}
+							else
+							{
+								invalidLocation = false;
+							}
+							passNum++;
+						}
 					}
-					else if (passNum == 1)
-					{
-						movement.y = 0;
-						movement.x = xVal;
-					}
-					string currentChunkKey = to_string((int)floor((offset[0] + movement.x + screenSize[0] / 2) / (chunkSize * boxSize)));
+				}
+
+				mouseBtn[0] = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+				mouseBtn[1] = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+				mouseCord[0] = sf::Mouse::getPosition(window).x;
+				mouseCord[1] = sf::Mouse::getPosition(window).y;
+
+				if (mouseBtn[0])
+				{
+					string currentChunkKey = to_string((int)floor((offset[0] + mouseCord[0]) / (chunkSize * boxSize)));
 					currentChunkKey.push_back('|');
-					currentChunkKey.append(to_string((int)floor((offset[1] + movement.y + screenSize[1] / 2) / (chunkSize * boxSize))));
+					currentChunkKey.append(to_string((int)floor((offset[1] + mouseCord[1]) / (chunkSize * boxSize))));
 					cout << currentChunkKey << " : key\n";
 					std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
 					if (it == worldMap.end())
@@ -334,8 +395,8 @@ int main()
 					else
 					{
 						GameChunk& currentChunk = it->second;
-						int boxX = (int)floor(((int)abs(offset[0] + movement.x + screenSize[0] / 2) % (chunkSize * boxSize)) / boxSize);
-						int boxY = (int)floor(((int)abs(offset[1] + movement.y + screenSize[1] / 2) % (chunkSize * boxSize)) / boxSize);
+						int boxX = (int)floor(((int)abs(offset[0] + mouseCord[0]) % (chunkSize * boxSize)) / boxSize);
+						int boxY = (int)floor(((int)abs(offset[1] + mouseCord[1]) % (chunkSize * boxSize)) / boxSize);
 						if (currentChunk.x < 0)
 						{
 							boxX = 7 - boxX;
@@ -344,60 +405,8 @@ int main()
 						{
 							boxY = 7 - boxY;
 						}
-
-						cout << boxX << "|" << boxY << " : box\n";
-						if (currentChunk.tiles[boxY][boxX].type != 2)
-						{
-							offset[0] += movement.x;
-							offset[1] += movement.y;
-							invalidLocation = false;
-						}
-						else if (passNum == 0)
-						{
-							movement.x = 0;
-						}
-						else if (passNum == 1)
-						{
-							movement.y = 0;
-							movement.x = xVal;
-						}
-						else
-						{
-							invalidLocation = false;
-						}
-						passNum++;
+						currentChunk.tiles[boxY][boxX] = GameTile(6, sf::Color(102, 56, 8));
 					}
-				}
-			}
-
-			mouseBtn[0] = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-			mouseBtn[1] = sf::Mouse::isButtonPressed(sf::Mouse::Right);
-			mouseCord[0] = sf::Mouse::getPosition(window).x;
-			mouseCord[1] = sf::Mouse::getPosition(window).y;
-
-			if (mouseBtn[0])
-			{
-				string currentChunkKey = to_string((int)floor((offset[0] + mouseCord[0]) / (chunkSize * boxSize)));
-				currentChunkKey.push_back('|');
-				currentChunkKey.append(to_string((int)floor((offset[1] + mouseCord[1]) / (chunkSize * boxSize))));
-				cout << currentChunkKey << " : key\n";
-				std::map<std::string, GameChunk>::iterator it = worldMap.find(currentChunkKey);
-				if (it == worldMap.end())
-				{}
-				else
-				{
-					GameChunk& currentChunk = it->second;
-					int boxX = (int)floor(((int)abs(offset[0] + mouseCord[0]) % (chunkSize * boxSize)) / boxSize);
-					int boxY = (int)floor(((int)abs(offset[1] + mouseCord[1]) % (chunkSize * boxSize)) / boxSize);
-					if (currentChunk.x < 0)
-					{
-						boxX = 7 - boxX;
-					}
-					if (currentChunk.y < 0)
-					{
-						boxY = 7 - boxY;
-					}
-					currentChunk.tiles[boxY][boxX] = GameTile(6, sf::Color(102, 56, 8));
 				}
 			}
 

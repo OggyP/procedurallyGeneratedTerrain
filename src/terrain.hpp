@@ -41,7 +41,7 @@ public:
 				if (noiseVal < -0.13)
 				{
 					// Ocean
-					tiles[yToCalc][xToCalc] = GameTile(2, sf::Color(0, 0, noiseVal * 320 + 200));
+					tiles[yToCalc][xToCalc] = GameTile(2, sf::Color(35, 46, noiseVal * 320 + 210));
 				}
 				else if (noiseVal < -0.08)
 				{
