@@ -211,6 +211,8 @@ int main()
 				if (mouseCord[0] >= screenSize[0] / 2 - 150 && mouseCord[0] <= screenSize[0] / 2 + 150 && mouseCord[1] >= screenSize[1] / 1.75 - 50 && mouseCord[1] <= screenSize[1] / 1.75 + 50)
 				{
 					titleScreen = false;
+					// Reset FPS
+					start = time(0);
 				}
 			}
 			else
