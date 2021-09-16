@@ -1,11 +1,12 @@
 #define UNUSED(x) (void)(x)
 #include "Platform/Platform.hpp"
 #include <math.h>
-#include <movementVector.hpp>
 // noise.hpp is included in terrain.hpp
+// movement vector is included in alien.hpp
 int boxSize = 10;
 float zoomScale = 0.06;
 const int chunkSize = 8;
+#include "alien.hpp"
 #include "terrain.hpp"
 #include <time.h>
 // #include <map>
@@ -152,9 +153,17 @@ int main()
 	playButton.setFillColor(sf::Color(219, 33, 8));
 	playButton.setOrigin(sf::Vector2f(150, 50));
 	sf::Texture playerTexture;
-	if (!playerTexture.loadFromFile("/content/1to1.png"))
+	if (!playerTexture.loadFromFile("./content/1to1.png"))
 	{
 		if (!playerTexture.loadFromFile("./src/1to1.png"))
+		{
+			return -1;
+		}
+	}
+	sf::Texture alienTexture;
+	if (!alienTexture.loadFromFile("./content/alien.png"))
+	{
+		if (!alienTexture.loadFromFile("./src/alien.png"))
 		{
 			return -1;
 		}
@@ -164,6 +173,11 @@ int main()
 	playerSprite.setTexture(playerTexture);
 	playerSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
 	playerSprite.setOrigin(sf::Vector2f(7, 25));
+	sf::Sprite alienSprite;
+	alienSprite.setScale(2, 2);
+	alienSprite.setTexture(alienTexture);
+	alienSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
+	alienSprite.setOrigin(sf::Vector2f(32, 32));
 
 	sf::Clock deltaClock;
 
@@ -209,6 +223,7 @@ int main()
 				screenSize[1] = (int)event.size.height;
 				window.setView(sf::View(visibleArea));
 				playerSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
+				alienSprite.setPosition(screenSize[0] / 2, screenSize[1] / 2);
 			}
 		}
 
@@ -289,29 +304,30 @@ int main()
 			{
 				movementVector movement;
 				int keysPressed = 0;
-				if (Keyboard::isKeyPressed(Keyboard::Left))
+				if (Keyboard::isKeyPressed(Keyboard::A))
 				{
 					movement.x -= movementSpeed * dt.asSeconds();
 					keysPressed++;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Down))
+				if (Keyboard::isKeyPressed(Keyboard::S))
 				{
 					movement.y += movementSpeed * dt.asSeconds();
 					keysPressed++;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Right))
+				if (Keyboard::isKeyPressed(Keyboard::D))
 				{
 					movement.x += movementSpeed * dt.asSeconds();
 					keysPressed++;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Up))
+				if (Keyboard::isKeyPressed(Keyboard::W))
 				{
 					movement.y -= movementSpeed * dt.asSeconds();
 					keysPressed++;
 				}
+
 				if (keysPressed > 0)
 				{
 					bool invalidLocation = true;
@@ -492,6 +508,7 @@ int main()
 			double secondsSinceStart = difftime(time(0), start);
 			UNUSED(secondsSinceStart);
 			// cout << "Framerate: " << totalFrames / secondsSinceStart << "\nBoxes Drawn: " << boxesDrawn << "\n";
+			cout << offset[0] << "|" << offset[1] << "\n";
 			window.display();
 		}
 	}
