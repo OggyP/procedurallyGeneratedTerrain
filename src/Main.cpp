@@ -152,9 +152,9 @@ int main()
 	playButton.setFillColor(sf::Color(219, 33, 8));
 	playButton.setOrigin(sf::Vector2f(150, 50));
 	sf::Texture playerTexture;
-	if (!playerTexture.loadFromFile("/content/1:1.png"))
+	if (!playerTexture.loadFromFile("/content/1to1.png"))
 	{
-		if (!playerTexture.loadFromFile("./src/1:1.png"))
+		if (!playerTexture.loadFromFile("./src/1to1.png"))
 		{
 			return -1;
 		}
